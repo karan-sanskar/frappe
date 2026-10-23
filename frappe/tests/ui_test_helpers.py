@@ -899,3 +899,20 @@ def create_webform_with_child_table_dropdown():
 			],
 		}
 	).insert()
+
+
+@whitelist_for_tests()
+def setup_if_owner_permission_doctype(name: str, rules: str | list):
+	frappe.db.delete("Custom DocPerm", {"parent": name})
+	frappe.delete_doc_if_exists("DocType", name, force=True)
+
+	frappe.get_doc(
+		{
+			"doctype": "DocType",
+			"module": "Custom",
+			"custom": 1,
+			"fields": [{"fieldname": "title", "fieldtype": "Data", "label": "Title"}],
+			"permissions": frappe.parse_json(rules),
+			"name": name,
+		}
+	).insert()
